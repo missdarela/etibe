@@ -1,12 +1,10 @@
 <template>
   <div class="min-h-screen bg-ajo-beige flex items-center justify-center p-6">
     <div class="w-full max-w-md">
-      <div class="text-center mb-10">
-        <div class="flex items-center justify-center gap-3 mb-2">
-          <AjoLogo :size="48" />
-          <h1 class="text-3xl font-bold text-ajo-green">Sujo</h1>
+      <div class="text-center">
+        <div class="flex justify-center">
+          <img src="/src/assets/sujo_logo_colored.png" alt="Sujo" class="h-48 w-auto" />
         </div>
-        <p class="text-sm text-gray-600">We rise together</p>
       </div>
 
       <div class="bg-white rounded-2xl shadow-lg p-8">
@@ -119,7 +117,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import AjoLogo from '../assets/icons/AjoLogo.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

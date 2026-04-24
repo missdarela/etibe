@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 export const useGroupsStore = defineStore('groups', () => {
+  const activeGroupId = ref(1)
+
   const groups = ref([
     {
       id: 1,
@@ -13,7 +15,7 @@ export const useGroupsStore = defineStore('groups', () => {
       progress: 75,
       hasNotification: true,
       nextPayout: '2026-04-25',
-      nextPayoutRecipient: 'Chidi Okonkwo'
+      nextPayoutUser: 'Chidi Okonkwo'
     },
     {
       id: 2,
@@ -25,7 +27,7 @@ export const useGroupsStore = defineStore('groups', () => {
       progress: 50,
       hasNotification: false,
       nextPayout: '2026-05-01',
-      nextPayoutRecipient: 'Amaka Johnson'
+      nextPayoutUser: 'Amaka Johnson'
     },
     {
       id: 3,
@@ -37,11 +39,11 @@ export const useGroupsStore = defineStore('groups', () => {
       progress: 90,
       hasNotification: true,
       nextPayout: '2026-04-23',
-      nextPayoutRecipient: 'Tunde Bakare'
+      nextPayoutUser: 'Tunde Bakare'
     },
     {
       id: 4,
-      name: '9-5 to Freedom',
+      name: 'Money Moves',
       avatar: 'https://i.pravatar.cc/150?img=4',
       members: 10,
       contributionAmount: 75000,
@@ -49,11 +51,11 @@ export const useGroupsStore = defineStore('groups', () => {
       progress: 60,
       hasNotification: false,
       nextPayout: '2026-04-28',
-      nextPayoutRecipient: 'Ngozi Eze'
+      nextPayoutUser: 'Ngozi Eze'
     },
     {
       id: 5,
-      name: 'Money Moves',
+      name: 'Village Vault',
       avatar: 'https://i.pravatar.cc/150?img=5',
       members: 20,
       contributionAmount: 25000,
@@ -61,11 +63,11 @@ export const useGroupsStore = defineStore('groups', () => {
       progress: 85,
       hasNotification: true,
       nextPayout: '2026-04-24',
-      nextPayoutRecipient: 'Kunle Adeyemi'
+      nextPayoutUser: 'Kunle Adeyemi'
     },
     {
       id: 6,
-      name: 'Village Vault',
+      name: 'Diaspora Circle',
       avatar: 'https://i.pravatar.cc/150?img=6',
       members: 6,
       contributionAmount: 150000,
@@ -73,62 +75,13 @@ export const useGroupsStore = defineStore('groups', () => {
       progress: 40,
       hasNotification: false,
       nextPayout: '2026-05-05',
-      nextPayoutRecipient: 'Blessing Okoro'
+      nextPayoutUser: 'Blessing Okoro'
     }
   ])
 
-  const activities = ref([
-    {
-      id: 1,
-      type: 'payout',
-      user: 'Chidi',
-      avatar: 'https://i.pravatar.cc/150?img=7',
-      amount: 800000,
-      group: null,
-      time: '9:50 AM',
-      emoji: '🎉'
-    },
-    {
-      id: 2,
-      type: 'contribution',
-      user: 'You',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      amount: 50000,
-      group: 'Family Oyesu',
-      time: '9:38 AM',
-      emoji: null
-    },
-    {
-      id: 3,
-      type: 'invite',
-      user: null,
-      avatar: 'https://i.pravatar.cc/150?img=8',
-      amount: null,
-      group: 'Diaspora Circle Lagos',
-      time: '9:35 AM',
-      emoji: null
-    },
-    {
-      id: 4,
-      type: 'contribution',
-      user: 'You',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      amount: 100000,
-      group: 'Family Oyesu',
-      time: '8:45 AM',
-      emoji: null
-    },
-    {
-      id: 5,
-      type: 'payout',
-      user: 'Chidi',
-      avatar: 'https://i.pravatar.cc/150?img=7',
-      amount: 800000,
-      group: null,
-      time: '8:30 AM',
-      emoji: '🎉'
-    }
-  ])
+  const activeGroup = computed(() =>
+    groups.value.find(g => g.id === activeGroupId.value) || groups.value[0]
+  )
 
   const stats = ref({
     totalSaved: 65000,
@@ -137,9 +90,15 @@ export const useGroupsStore = defineStore('groups', () => {
     nextPayout: 5
   })
 
+  function setActiveGroup(id) {
+    activeGroupId.value = id
+  }
+
   return {
     groups,
-    activities,
-    stats
+    activeGroupId,
+    activeGroup,
+    stats,
+    setActiveGroup
   }
 })

@@ -1,14 +1,12 @@
 <template>
   <aside class="w-44 bg-ajo-green text-white flex flex-col h-screen fixed left-0 top-0">
-    <div class="p-6">
-      <div class="flex items-center gap-3 mb-1">
-        <AjoLogo :size="32" />
-        <span class="text-xl font-semibold">Sujo</span>
+    <div class="p-3">
+      <div class="flex justify-center">
+        <img src="/src/assets/sujo_logo.png" alt="Sujo" class="h-24 w-auto" />
       </div>
-      <p class="text-xs text-white/70 ml-11">We rise together</p>
     </div>
 
-    <nav class="flex-1 px-3 space-y-1">
+    <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
       <router-link
         v-for="item in mainNav"
         :key="item.name"
@@ -48,23 +46,11 @@
         </router-link>
       </div>
     </nav>
-
-    <div class="h-20 relative overflow-hidden">
-      <svg class="w-full h-full" viewBox="0 0 176 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <pattern id="zigzag" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M0 10 L10 0 L20 10 L10 20 Z" fill="#C8A96A" opacity="0.15"/>
-        </pattern>
-        <rect width="176" height="80" fill="url(#zigzag)"/>
-        <path d="M0 20 L20 0 L40 20 L60 0 L80 20 L100 0 L120 20 L140 0 L160 20 L176 10" 
-              stroke="#C8A96A" stroke-width="2" opacity="0.3" fill="none"/>
-      </svg>
-    </div>
   </aside>
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router'
-import AjoLogo from '../../assets/icons/AjoLogo.vue'
 import { 
   HomeIcon, WalletIcon, UsersIcon, CreditCardIcon,
   BookOpenIcon, ClockIcon, BarChartIcon,

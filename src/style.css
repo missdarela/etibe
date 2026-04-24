@@ -1,11 +1,6 @@
-@import "tailwindcss";
-
-@theme {
-  --color-ajo-green: #0F3D2E;
-  --color-ajo-gold: #C8A96A;
-  --color-ajo-beige: #F5F1E8;
-  --color-ajo-cream: #EDE8DC;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   margin: 0;
