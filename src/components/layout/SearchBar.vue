@@ -33,7 +33,7 @@
             <div>
               <p class="text-sm font-medium text-gray-900">{{ group.name }}</p>
               <p class="text-xs text-gray-500">
-                {{ group.members }} members · ₦{{ group.contributionAmount.toLocaleString('en-NG') }}/{{ group.frequency }}
+                {{ groupMembersStore.getMemberCount(group.id) }} members · ₦{{ group.contributionAmount.toLocaleString('en-NG') }}/{{ group.frequency }}
               </p>
             </div>
           </div>
@@ -51,9 +51,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useGroupsStore } from '../../stores/groups'
+import { useGroupMembersStore } from '../../stores/groupMembers'
+import { useAuthStore } from '../../stores/auth'
 import { SearchIcon, XIcon } from './Icons.js'
 
 const groupsStore = useGroupsStore()
+const groupMembersStore = useGroupMembersStore()
+const authStore = useAuthStore()
 const searchQuery = ref('')
 const showResults = ref(false)
 const containerRef = ref(null)
@@ -61,10 +65,14 @@ const containerRef = ref(null)
 const filteredGroups = computed(() => {
   if (!searchQuery.value.trim()) return []
   const q = searchQuery.value.toLowerCase()
-  return groupsStore.groups.filter(g =>
-    g.name.toLowerCase().includes(q) ||
-    g.nextPayoutUser?.toLowerCase().includes(q)
-  )
+  return groupsStore.groups.filter(g => {
+    if (g.name.toLowerCase().includes(q)) return true
+    const members = groupMembersStore.getMembersByGroup(g.id)
+    return members.some(m => {
+      const user = authStore.getUserById(m.userId)
+      return user?.fullName?.toLowerCase().includes(q) || user?.name?.toLowerCase().includes(q)
+    })
+  })
 })
 
 function selectGroup(group) {

@@ -9,7 +9,7 @@
         />
         <div>
           <h3 class="font-semibold text-gray-900 text-sm">{{ activeGroup.name }}</h3>
-          <p class="text-xs text-gray-400">{{ activeGroup.members }} members</p>
+          <p class="text-xs text-gray-400">{{ memberCount }} {{ memberCount === 1 ? 'member' : 'members' }}</p>
         </div>
       </div>
       <button class="p-1 hover:bg-gray-100 rounded transition-colors">
@@ -62,17 +62,22 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useChatStore } from '../../stores/chat'
 import { useGroupsStore } from '../../stores/groups'
+import { useGroupMembersStore } from '../../stores/groupMembers'
 import { MoreVerticalIcon, SendIcon } from '../layout/Icons.js'
 import ChatMessage from './ChatMessage.vue'
 
 const chatStore = useChatStore()
 const groupsStore = useGroupsStore()
+const groupMembersStore = useGroupMembersStore()
 const newMessage = ref('')
 const messagesContainer = ref(null)
 
 const activeGroup = computed(() => groupsStore.activeGroup)
+const memberCount = computed(() =>
+  activeGroup.value ? groupMembersStore.getMemberCount(activeGroup.value.id) : 0
+)
 const activeMessages = computed(() =>
-  chatStore.getMessagesForGroup(groupsStore.activeGroupId)
+  chatStore.getMessagesByGroup(groupsStore.activeGroupId)
 )
 
 const scrollToBottom = async () => {
@@ -86,9 +91,9 @@ watch(activeMessages, scrollToBottom, { deep: true })
 watch(() => groupsStore.activeGroupId, scrollToBottom)
 
 const handleSend = () => {
-  if (newMessage.value.trim()) {
-    chatStore.sendMessage(groupsStore.activeGroupId, newMessage.value.trim())
-    newMessage.value = ''
-  }
+  const text = newMessage.value.trim()
+  if (!text) return
+  chatStore.sendMessage(text)
+  newMessage.value = ''
 }
 </script>

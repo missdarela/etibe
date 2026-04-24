@@ -44,10 +44,20 @@ export const useActivityStore = defineStore('activity', () => {
     [...activities.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
   )
 
+  /**
+   * addActivity(message)            — spec: accepts a string
+   * addActivity({ type, message, avatar }) — rich form
+   */
   function addActivity(activity) {
+    const payload =
+      typeof activity === 'string'
+        ? { type: 'info', message: activity, avatar: 'https://i.pravatar.cc/150?img=12' }
+        : activity
+
     activities.value.unshift({
-      id: Date.now(),
-      ...activity,
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      avatar: 'https://i.pravatar.cc/150?img=12',
+      ...payload,
       timestamp: new Date()
     })
   }

@@ -1,46 +1,57 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useAuthStore } from './auth'
+import { useGroupsStore } from './groups'
 
+// messages table shape:
+// { id, groupId, senderId, text, timestamp }
 export const useChatStore = defineStore('chat', () => {
   const isVisible = ref(true)
 
-  const messagesByGroup = ref({
-    1: [
-      { id: 1, groupId: 1, sender: 'Chidi Okonkwo', avatar: 'https://i.pravatar.cc/150?img=7', text: 'Has everyone contributed this week? We need to hit the target 💪', timestamp: '10:15 AM', isOwn: false },
-      { id: 2, groupId: 1, sender: 'You', avatar: 'https://i.pravatar.cc/150?img=12', text: 'Already sent mine this morning!', timestamp: '10:18 AM', isOwn: true },
-      { id: 3, groupId: 1, sender: 'Amaka Johnson', avatar: 'https://i.pravatar.cc/150?img=9', text: 'Same here. When is the next payout date?', timestamp: '10:20 AM', isOwn: false },
-      { id: 4, groupId: 1, sender: 'You', avatar: 'https://i.pravatar.cc/150?img=12', text: 'April 25th for Chidi 🎉', timestamp: '10:21 AM', isOwn: true }
-    ],
-    2: [
-      { id: 1, groupId: 2, sender: 'Tunde Bakare', avatar: 'https://i.pravatar.cc/150?img=3', text: 'Monthly contribution reminder for everyone 📢', timestamp: '9:00 AM', isOwn: false },
-      { id: 2, groupId: 2, sender: 'You', avatar: 'https://i.pravatar.cc/150?img=12', text: 'Got it, will send by end of day', timestamp: '9:30 AM', isOwn: true }
-    ],
-    3: [
-      { id: 1, groupId: 3, sender: 'Ngozi Eze', avatar: 'https://i.pravatar.cc/150?img=4', text: 'Great progress everyone! Only 10% left 🙌', timestamp: '8:45 AM', isOwn: false },
-      { id: 2, groupId: 3, sender: 'You', avatar: 'https://i.pravatar.cc/150?img=12', text: 'Almost there! Payout soon for Tunde 🔥', timestamp: '8:50 AM', isOwn: true }
-    ],
-    4: [
-      { id: 1, groupId: 4, sender: 'Kunle Adeyemi', avatar: 'https://i.pravatar.cc/150?img=5', text: 'Bi-weekly check-in. Are we all on track?', timestamp: '7:00 AM', isOwn: false }
-    ]
-  })
+  const messages = ref([
+    { id: 1, groupId: 1, senderId: 2, text: 'Has everyone contributed this week? We need to hit the target 💪', timestamp: '2026-04-22T10:15:00' },
+    { id: 2, groupId: 1, senderId: 1, text: 'Already sent mine this morning!',                                  timestamp: '2026-04-22T10:18:00' },
+    { id: 3, groupId: 1, senderId: 3, text: 'Same here. When is the next payout date?',                         timestamp: '2026-04-22T10:20:00' },
+    { id: 4, groupId: 1, senderId: 1, text: 'April 25th for Chidi 🎉',                                           timestamp: '2026-04-22T10:21:00' },
 
-  function getMessagesForGroup(groupId) {
-    return messagesByGroup.value[groupId] || []
+    { id: 5, groupId: 2, senderId: 4, text: 'Monthly contribution reminder for everyone 📢', timestamp: '2026-04-22T09:00:00' },
+    { id: 6, groupId: 2, senderId: 1, text: 'Got it, will send by end of day',               timestamp: '2026-04-22T09:30:00' },
+
+    { id: 7, groupId: 3, senderId: 5, text: 'Great progress everyone! Only 10% left 🙌',  timestamp: '2026-04-22T08:45:00' },
+    { id: 8, groupId: 3, senderId: 1, text: 'Almost there! Payout soon for Tunde 🔥',     timestamp: '2026-04-22T08:50:00' },
+
+    { id: 9, groupId: 4, senderId: 6, text: 'Bi-weekly check-in. Are we all on track?', timestamp: '2026-04-22T07:00:00' }
+  ])
+
+  // Get all messages for a group, sorted by timestamp ascending
+  function getMessagesByGroup(groupId) {
+    return messages.value
+      .filter(m => m.groupId === groupId)
+      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
   }
 
-  function sendMessage(groupId, text) {
-    if (!messagesByGroup.value[groupId]) {
-      messagesByGroup.value[groupId] = []
-    }
-    messagesByGroup.value[groupId].push({
+  // Send a message to the currently active group.
+  // Auto-fills senderId from auth + groupId from active group.
+  function sendMessage(text) {
+    const authStore = useAuthStore()
+    const groupsStore = useGroupsStore()
+    const user = authStore.currentUser
+    if (!user || !groupsStore.activeGroupId) return null
+
+    const msg = {
       id: Date.now(),
-      groupId,
-      sender: 'You',
-      avatar: 'https://i.pravatar.cc/150?img=12',
+      groupId: groupsStore.activeGroupId,
+      senderId: user.id,
       text,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-      isOwn: true
-    })
+      timestamp: new Date().toISOString()
+    }
+    messages.value.push(msg)
+    return msg
+  }
+
+  function deleteMessage(id) {
+    const idx = messages.value.findIndex(m => m.id === id)
+    if (idx !== -1) messages.value.splice(idx, 1)
   }
 
   function toggleVisibility() {
@@ -48,10 +59,11 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   return {
-    messagesByGroup,
+    messages,
     isVisible,
-    getMessagesForGroup,
+    getMessagesByGroup,
     sendMessage,
+    deleteMessage,
     toggleVisibility
   }
 })

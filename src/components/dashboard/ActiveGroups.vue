@@ -28,7 +28,7 @@ import { useGroupsStore } from '../../stores/groups'
 import GroupCard from './GroupCard.vue'
 
 const groupsStore = useGroupsStore()
-const groups = computed(() => groupsStore.groups)
+const groups = computed(() => groupsStore.currentUserGroups)
 const activeGroupId = computed(() => groupsStore.activeGroupId)
 </script>
 

@@ -1,6 +1,15 @@
 <template>
   <div class="mb-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900">Recent Activity</h2>
+      <button
+        v-if="canSimulatePayout"
+        @click="simulatePayout"
+        class="text-xs font-medium text-ajo-gold hover:text-ajo-gold/80 transition-colors"
+      >
+        Simulate payout →
+      </button>
+    </div>
 
     <div class="space-y-1">
       <p class="text-xs text-gray-500 font-medium mb-3">Today</p>
@@ -37,9 +46,30 @@
 <script setup>
 import { computed } from 'vue'
 import { useActivityStore } from '../../stores/activity'
+import { useGroupsStore } from '../../stores/groups'
+import { useGroupMembersStore } from '../../stores/groupMembers'
 
 const activityStore = useActivityStore()
+const groupsStore = useGroupsStore()
+const groupMembersStore = useGroupMembersStore()
+
 const sortedActivities = computed(() => activityStore.sortedActivities)
+
+const nextEligibleMember = computed(() => {
+  const groupId = groupsStore.activeGroupId
+  if (!groupId) return null
+  return groupMembersStore
+    .getMembersByGroup(groupId)
+    .filter(m => !m.hasReceived)
+    .sort((a, b) => a.payoutPosition - b.payoutPosition)[0] || null
+})
+
+const canSimulatePayout = computed(() => !!nextEligibleMember.value)
+
+function simulatePayout() {
+  const m = nextEligibleMember.value
+  if (m) groupMembersStore.markReceived(m.userId, m.groupId)
+}
 
 const activityEmoji = (type) => {
   if (type === 'payout') return '💰'

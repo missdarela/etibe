@@ -41,6 +41,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useGroupsStore } from '../../stores/groups'
 
 const props = defineProps({
   group: { type: Object, required: true },
@@ -49,15 +50,19 @@ const props = defineProps({
 
 defineEmits(['click'])
 
+const groupsStore = useGroupsStore()
+
+const progress = computed(() => groupsStore.groupProgress(props.group.id))
+
 const circumference = 2 * Math.PI * 36
 
 const dashOffset = computed(() =>
-  circumference - (props.group.progress / 100) * circumference
+  circumference - (progress.value / 100) * circumference
 )
 
 const progressColor = computed(() => {
-  if (props.group.progress >= 80) return '#10B981'
-  if (props.group.progress >= 50) return '#F59E0B'
+  if (progress.value >= 80) return '#10B981'
+  if (progress.value >= 50) return '#F59E0B'
   return '#EF4444'
 })
 </script>
