@@ -6,7 +6,7 @@
       </div>
     </div>
 
-    <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+    <nav class="flex-1 px-3 space-y-1">
       <router-link
         v-for="item in mainNav"
         :key="item.name"
